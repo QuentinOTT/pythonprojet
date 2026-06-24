@@ -36,6 +36,9 @@ class App(tk.Tk):
         self._build_header()
         self._build_body()
         self._build_statusbar()
+        self._refresh_tree()
+        if db.is_empty():
+            self._download_async()
 
     def _build_menu(self):
         bar = tk.Menu(self)
