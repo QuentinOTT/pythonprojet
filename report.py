@@ -34,16 +34,47 @@ def parse_metadata(text):
 
 def extract_first_chapter(text):
     pattern = r"(Chapter I|CHAPTER I|Chapter 1|CHAPTER 1)(?![IV0-9])"
-    starts  = [m.start() for m in re.finditer(pattern, text)]
-    if not starts:
+    matches = list(re.finditer(pattern, text))
+    if not matches:
         raise ValueError("Chapitre 1 introuvable.")
-    start       = starts[0]
+    
+    start = None
+    for m in matches:
+        line_start = text.rfind('\n', 0, m.start()) + 1
+        line_end = text.find('\n', m.end())
+        if line_end == -1:
+            line_end = len(text)
+        line = text[line_start:line_end].strip()
+        if len(line) < 40:
+            start = m.start()
+            break
+            
+    if start is None:
+        start = matches[0].start()
+        
     end_pattern = r"(Chapter II|CHAPTER II|Chapter 2|CHAPTER 2)(?![IV0-9])"
-    ends        = [m.start() for m in re.finditer(end_pattern, text)]
-    end         = ends[0] if ends else start + 8000
+    end_matches = list(re.finditer(end_pattern, text))
+    
+    end = None
+    for m in end_matches:
+        if m.start() > start:
+            line_start = text.rfind('\n', 0, m.start()) + 1
+            line_end = text.find('\n', m.end())
+            if line_end == -1:
+                line_end = len(text)
+            line = text[line_start:line_end].strip()
+            if len(line) < 40:
+                end = m.start()
+                break
+                
+    if end is None:
+        end = start + 8000
+        
     return text[start:end].strip()
 
 def split_paragraphs(chapter):
+    # Gutenberg utilise \r\n — normaliser d'abord
+    chapter = chapter.replace('\r\n', '\n').replace('\r', '\n')
     raw = re.split(r'\n\s*\n', chapter)
     return [p.strip().replace('\n', ' ') for p in raw if len(p.strip()) > 30]
 
