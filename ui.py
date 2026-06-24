@@ -247,11 +247,48 @@ class App(tk.Tk):
     def _pick_bg(self):
         color = colorchooser.askcolor(title="Couleur de fond")[1]
         if color:
+            global BG
+            old_bg = BG
+            BG = color
             self.configure(bg=color)
+            self._update_widget_bg(self, color, old_bg)
             self._set_status(f"🎨 Couleur de fond : {color}")
 
+    def _update_widget_bg(self, widget, color, old_bg):
+        if hasattr(widget, "configure"):
+            try:
+                bg_opt = widget.cget("bg")
+                if bg_opt == old_bg:
+                    widget.configure(bg=color)
+            except Exception:
+                pass
+        for child in widget.winfo_children():
+            self._update_widget_bg(child, color, old_bg)
+
     def _set_font(self, family):
+        import tkinter.font as tkfont
+        self._update_widget_font(self, family, tkfont)
         self._set_status(f"🔤 Police sélectionnée : {family}")
+
+    def _update_widget_font(self, widget, family, tkfont):
+        if isinstance(widget, ttk.Treeview):
+            style = ttk.Style()
+            style.configure("Treeview", font=(family, 10))
+            style.configure("Treeview.Heading", font=(family, 10, "bold"))
+        else:
+            if hasattr(widget, "configure"):
+                try:
+                    current_font = widget.cget("font")
+                    if current_font:
+                        actual = tkfont.Font(font=current_font)
+                        size = actual.actual("size")
+                        weight = actual.actual("weight")
+                        slant = actual.actual("slant")
+                        widget.configure(font=(family, size, weight, slant))
+                except Exception:
+                    pass
+        for child in widget.winfo_children():
+            self._update_widget_font(child, family, tkfont)
 
 
 if __name__ == "__main__":
