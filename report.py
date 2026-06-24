@@ -11,7 +11,7 @@ from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 BOOK_URL   = "https://www.gutenberg.org/cache/epub/1342/pg1342.txt"
-IMAGE1_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/PrideAndPrejudiceTitlePage.jpg/400px-PrideAndPrejudiceTitlePage.jpg"
+IMAGE1_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/PrideAndPrejudiceTitlePage.jpg/500px-PrideAndPrejudiceTitlePage.jpg"
 REPORTER   = "Quentin Ott"
 OUT_DIR    = "rapport_output"
 os.makedirs(OUT_DIR, exist_ok=True)
