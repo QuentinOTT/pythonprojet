@@ -148,6 +148,10 @@ def paste_logo(base_path, logo_path, out_path):
     base.convert("RGB").save(out_path)
 
 def build_word_report(title, author, reporter, image_path, chart_path, stats, out_path):
+    image_path = os.path.abspath(image_path)
+    chart_path = os.path.abspath(chart_path)
+    out_path   = os.path.abspath(out_path)
+
     doc = Document()
     doc.add_paragraph()
 
@@ -161,10 +165,13 @@ def build_word_report(title, author, reporter, image_path, chart_path, stats, ou
     doc.add_paragraph()
     p_img = doc.add_paragraph()
     p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    print(f"Cover image path: {image_path}")
+    print(f"Cover image exists: {os.path.exists(image_path)}")
     try:
         p_img.add_run().add_picture(image_path, width=Inches(4.2))
-    except Exception:
-        p_img.add_run("[Image non disponible]")
+    except Exception as e:
+        print(f"Erreur image de couverture: {e}")
+        p_img.add_run(f"[Image non disponible : {e}]")
 
     doc.add_paragraph()
     p2 = doc.add_paragraph()
@@ -189,10 +196,13 @@ def build_word_report(title, author, reporter, image_path, chart_path, stats, ou
 
     p_chart = doc.add_paragraph()
     p_chart.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    print(f"Chart path: {chart_path}")
+    print(f"Chart exists: {os.path.exists(chart_path)}")
     try:
         p_chart.add_run().add_picture(chart_path, width=Inches(5.5))
-    except Exception:
-        p_chart.add_run("[Graphique non disponible]")
+    except Exception as e:
+        print(f"Erreur graphique: {e}")
+        p_chart.add_run(f"[Graphique non disponible : {e}]")
 
     doc.add_paragraph()
     ph2 = doc.add_paragraph()
