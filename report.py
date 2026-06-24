@@ -18,7 +18,8 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 
 def download_text(url):
-    r = requests.get(url, timeout=20)
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+    r = requests.get(url, headers=headers, timeout=20)
     r.raise_for_status()
     r.encoding = "utf-8"
     return r.text
@@ -77,7 +78,8 @@ def create_chart(distrib, path):
     plt.close()
 
 def download_image(url, path):
-    r = requests.get(url, timeout=20)
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+    r = requests.get(url, headers=headers, timeout=20)
     r.raise_for_status()
     img = Image.open(BytesIO(r.content)).convert("RGB")
     img.save(path)
