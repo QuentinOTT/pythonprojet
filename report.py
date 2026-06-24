@@ -159,11 +159,12 @@ def build_word_report(title, author, reporter, image_path, chart_path, stats, ou
     r.font.color.rgb = RGBColor(0x1F, 0x38, 0x64)
 
     doc.add_paragraph()
+    p_img = doc.add_paragraph()
+    p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
     try:
-        doc.add_picture(image_path, width=Inches(4.2))
-        doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.add_run().add_picture(image_path, width=Inches(4.2))
     except Exception:
-        doc.add_paragraph("[Image non disponible]").alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.add_run("[Image non disponible]")
 
     doc.add_paragraph()
     p2 = doc.add_paragraph()
@@ -186,10 +187,12 @@ def build_word_report(title, author, reporter, image_path, chart_path, stats, ou
     rh.font.name = "Times New Roman"
     rh.font.color.rgb = RGBColor(0x1F, 0x38, 0x64)
 
+    p_chart = doc.add_paragraph()
+    p_chart.alignment = WD_ALIGN_PARAGRAPH.CENTER
     try:
-        doc.add_picture(chart_path, width=Inches(6.5))
+        p_chart.add_run().add_picture(chart_path, width=Inches(5.5))
     except Exception:
-        doc.add_paragraph("[Graphique non disponible]")
+        p_chart.add_run("[Graphique non disponible]")
 
     doc.add_paragraph()
     ph2 = doc.add_paragraph()
