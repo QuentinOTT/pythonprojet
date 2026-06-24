@@ -153,28 +153,38 @@ class App(tk.Tk):
         self._refresh_tree(rows)
 
     def _download_async(self):
-        threading.Thread(target=self._download_worker, daemon=True).start()
+        if not db.is_empty():
+            ans = messagebox.askyesno(
+                "Base non vide",
+                "La base contient déjà des données.\nVoulez-vous les remplacer ?"
+            )
+            if not ans:
+                self._set_status("Téléchargement annulé.")
+                return
+        else:
+            ans = True
+        
+        self._set_status("⏳ Téléchargement en cours…")
+        threading.Thread(target=self._download_worker, args=(ans,), daemon=True).start()
 
-    def _download_worker(self):
+    def _download_worker(self, replace_data):
         try:
-            self._set_status("⏳ Téléchargement en cours…")
-            if not db.is_empty():
-                ans = messagebox.askyesno(
-                    "Base non vide",
-                    "La base contient déjà des données.\nVoulez-vous les remplacer ?"
-                )
-                if not ans:
-                    self._set_status("Téléchargement annulé.")
-                    return
+            if replace_data:
                 db.clear()
             rows = api.download_countries()
             db.insert_many(rows)
-            self._refresh_tree()
-            self._set_status(f"✅ {len(rows)} pays téléchargés et enregistrés.")
-            messagebox.showinfo("Succès", f"{len(rows)} pays enregistrés dans la base.")
+            self.after(0, self._download_success, rows)
         except Exception as exc:
-            self._set_status(f"❌ Erreur : {exc}")
-            messagebox.showerror("Erreur", str(exc))
+            self.after(0, self._download_error, exc)
+
+    def _download_success(self, rows):
+        self._refresh_tree()
+        self._set_status(f"✅ {len(rows)} pays téléchargés et enregistrés.")
+        messagebox.showinfo("Succès", f"{len(rows)} pays enregistrés dans la base.")
+
+    def _download_error(self, exc):
+        self._set_status(f"❌ Erreur : {exc}")
+        messagebox.showerror("Erreur", str(exc))
 
     def _ask_clear(self):
         if messagebox.askyesno("Confirmer", "Effacer toutes les données ?"):
